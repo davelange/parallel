@@ -17,7 +17,7 @@ export default function App() {
 
   const blockArray = useMemo(
     () =>
-      new Array(BLOCK_QTY).fill(0).map((_, ind) => ({
+      new Array(1).fill(0).map((_, ind) => ({
         x: randomNegativeOrPositive(15),
         y: randomNegativeOrPositive(6),
         z: randomNegativeOrPositive(4),
@@ -32,7 +32,7 @@ export default function App() {
       <Canvas camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 25] }}>
         <Physics gravity={[0, 0, 0]}>
           <Debug color="black" scale={1.1}>
-            <OrbitControls />
+            {/* <OrbitControls /> */}
 
             <Limit
               name="end"
