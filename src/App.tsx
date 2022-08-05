@@ -1,26 +1,26 @@
 import { Canvas } from "@react-three/fiber";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Cube from "./components/Cube";
 import { Physics, Debug } from "@react-three/cannon";
 import Limit from "./components/Limit";
 import { OrbitControls } from "@react-three/drei";
+import { randomNegativeOrPositive } from "./utils/math";
+import useSceneStore from "./lib/sceneStore";
 
-const BLOCK_QTY = 16;
+const BLOCK_QTY = 12;
 const MAX_POS = 10;
 const SPEED = 1;
 
-// 18 _ 8
-
 export default function App() {
-  const randomNegativeOrPositive = (max: number) =>
-    Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
+  const toggleFloating = useSceneStore((state) => state.toggleFloating);
 
   const blockArray = useMemo(
     () =>
-      new Array(1).fill(0).map((_, ind) => ({
+      new Array(BLOCK_QTY).fill(0).map((_, ind) => ({
         x: randomNegativeOrPositive(15),
         y: randomNegativeOrPositive(6),
         z: randomNegativeOrPositive(4),
+        endX: ind * 20 / BLOCK_QTY - 10,
         motionX: ind % 2 === 0 ? SPEED : -SPEED,
         motionY: ind % 2 === 0 ? -SPEED : SPEED,
       })),
@@ -28,11 +28,11 @@ export default function App() {
   );
 
   return (
-    <div id="canvas-container">
+    <div id="canvas-container" onClick={toggleFloating}>
       <Canvas camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 25] }}>
         <Physics gravity={[0, 0, 0]}>
-          <Debug color="black" scale={1.1}>
-            {/* <OrbitControls /> */}
+          {/* <Debug color="black" scale={1.1}> */}
+            <OrbitControls />
 
             <Limit
               name="end"
@@ -66,7 +66,7 @@ export default function App() {
 
             <ambientLight intensity={0.1} />
             <directionalLight color="#fff" position={[0, 0, 5]} />
-          </Debug>
+          {/* </Debug> */}
         </Physics>
       </Canvas>
     </div>
