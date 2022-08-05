@@ -1,58 +1,44 @@
 import { Mesh } from "three";
-import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
+import { CollideBeginEvent, Triplet, useBox } from "@react-three/cannon";
 
 export default function Cube({
   x,
   y,
   z,
   motionX,
-  motionZ,
+  motionY,
 }: {
   x: number;
   y: number;
   z: number;
   motionX: number;
-  motionZ: number;
+  motionY: number;
 }) {
-  const cubeRef = useRef<Mesh>(null!);
-  
-  const motion = useRef({ x: motionX, y: motionZ });
-  const prevMotion = useRef({ x: motionX, y: motionZ });
+  const velo = useRef([motionX, motionY, 0]);
 
-  useFrame(() => {
-    const { x, y } = cubeRef.current.position;    
+  const [cubeRef, api] = useBox<Mesh>(() => ({
+    mass: 1,
+    position: [x, y, z],
+    velocity: [motionX, motionY, 0],
+    onCollideBegin: invertGravity,
+  }));
 
-    if (x > 15 || x < -15) {    
-      if (motion.current.x === prevMotion.current.x) {
-        motion.current.x = motion.current.x * -1;        
-      }
-    } else {
-      if (motion.current.x !== prevMotion.current.x) {
-        prevMotion.current.x = motion.current.x;
-      }
+  function invertGravity(event: CollideBeginEvent) {
+    const limit = event.body.name;
+
+    if (limit === "top" || limit === "bottom") {
+      velo.current[1] *= -1;
+    } else if (limit === "right" || limit === "left") {
+      velo.current[0] *= -1;
     }
 
-    if (y > 6 || y < -6) {
-      if (motion.current.y === prevMotion.current.y) {
-        motion.current.y = motion.current.y * -1;        
-      }
-    } else {
-      if (motion.current.y !== prevMotion.current.y) {
-        prevMotion.current.y = motion.current.y;
-      }
-    }
-
-    cubeRef.current.position.x += motion.current.x;
-    cubeRef.current.position.y += motion.current.y;
-
-    // cubeRef.current.rotation.x += inc.x;
-    // cubeRef.current.rotation.y += inc.y;
-  });
+    api.velocity.set(...(velo.current as Triplet));
+  }
 
   return (
     <mesh ref={cubeRef} position={[x, y, z]}>
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={[0.8, 0.8, 0.8]} />
       <meshStandardMaterial color="hotpink" />
     </mesh>
   );
