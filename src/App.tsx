@@ -1,34 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { Canvas } from "@react-three/fiber";
+import { useMemo } from "react";
+import Cube from "./components/Cube";
 
-function App() {
-  const [count, setCount] = useState(0)
+const BLOCK_QTY = 20;
+const MAX_POS = 10;
+
+// 18 _ 8
+
+export default function App() {
+  const randomNegativeOrPositive = (max: number) =>
+    Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
+
+  const blockArray = useMemo(
+    () =>
+      new Array(1).fill(0).map((item, ind) => ({
+        x: randomNegativeOrPositive(15),
+        y: randomNegativeOrPositive(6),
+        z: randomNegativeOrPositive(4),
+        motionX: ind % 2 === 0 ? 0.1 : -0.1,
+        motionZ: ind % 2 === 0 ? -0.1 : 0.1,
+      })),
+    []
+  );
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
-}
+    <div id="canvas-container">
+      <Canvas camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 20] }}>
+        {blockArray.map((item) => (
+          <Cube {...item} />
+        ))}
 
-export default App
+        <ambientLight intensity={0.1} />
+        <directionalLight color="#fff" position={[0, 0, 5]} />
+      </Canvas>
+    </div>
+  );
+}
