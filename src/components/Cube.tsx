@@ -3,10 +3,10 @@ import { Mesh } from "three";
 import { useEffect, useRef } from "react";
 import { CollideBeginEvent, Triplet, useBox } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
-import { easeInOutBack } from "../utils/easings";
+import { easeInOutBack, easeOutBounce } from "../utils/easings";
 import useSceneStore from "../lib/sceneStore";
 
-const CYCLES = 50;
+const CYCLES = 100;
 
 enum _ {
   X = 0,
@@ -31,11 +31,17 @@ export default function Cube({
   motionX: number;
   motionY: number;
 }) {
-  console.log(endX);
+  const [cubeRef, api] = useBox<Mesh>(() => ({
+    mass: 1,
+    position: [x, y, z],
+    velocity: [motionX, motionY, 0],
+    onCollideBegin: invertGravity,
+  }));
 
   const velo = useRef<Triplet>([motionX, motionY, 0]);
   const floating = useRef(true);
   const pos = useRef<Triplet>();
+  const rotation = useRef<Triplet>();
   const snap = useRef({
     initialPos: [0, 0, 0] as Triplet,
     doneCycles: 0,
@@ -43,15 +49,10 @@ export default function Cube({
     alternator: [1, 1, 1] as Triplet,
   });
 
-  const [cubeRef, api] = useBox<Mesh>(() => ({
-    mass: 1,
-    position: [x, y, 0],
-    velocity: [motionX, motionY, 0],
-    /* type: "Kinematic", */
-    onCollideBegin: invertGravity,
-  }));
-
-  useEffect(() => api.position.subscribe((v) => (pos.current = v)), []);
+  useEffect(() => {
+    api.position.subscribe((v) => (pos.current = v));
+    api.rotation.subscribe((v) => (rotation.current = v));
+  }, []);
 
   function invertGravity(event: CollideBeginEvent) {
     if (!floating.current) {
@@ -75,7 +76,7 @@ export default function Cube({
         ...snap.current,
         initialPos: pos.current!,
         alternator: [
-          pos.current![_.X] > 0 ? _.NEG : _.POS,
+          pos.current![_.X] > endX ? _.NEG : _.POS,
           pos.current![_.Y] > 0 ? _.NEG : _.POS,
           pos.current![_.Z] > 0 ? _.NEG : _.POS,
         ],
@@ -86,19 +87,33 @@ export default function Cube({
       api.collisionResponse.set(false);
       api.angularVelocity.set(0, 0, 0);
     } else {
-      /* api.velocity.set(...velo.current);
       floating.current = true;
+      api.velocity.set(...velo.current);
       snap.current = {
         ...snap.current,
         lastMove: 0,
         doneCycles: 0,
-      }; */
+      };
     }
   }
 
   useSceneStore.subscribe(() => startSnap());
 
+  function rotate() {
+    if (!rotation?.current) {
+      return;
+    }
+
+    api.rotation.set(
+      rotation.current[_.X] + 0.01,
+      rotation.current[_.Y] + 0.01,
+      rotation.current[_.Z]
+    );
+  }
+
   useFrame(() => {
+    rotate();
+
     if (
       !pos.current ||
       floating.current ||
@@ -110,14 +125,16 @@ export default function Cube({
     const [x, y, z] = pos.current;
     let { doneCycles, alternator, initialPos, lastMove } = snap.current;
 
-    const ease = easeInOutBack(doneCycles, CYCLES);
+    const ease = easeOutBounce(doneCycles, CYCLES);
 
     const moveY =
       Math.abs(initialPos[_.Y]) * (ease - lastMove) * alternator[_.Y];
     const moveX =
       Math.abs(initialPos[_.X] - endX) * (ease - lastMove) * alternator[_.X];
+    const moveZ =
+      Math.abs(initialPos[_.Z]) * (ease - lastMove) * alternator[_.Z];
 
-    api.position.set(x + moveX, y + moveY, z);
+    api.position.set(x + moveX, y + moveY, z + moveZ);
 
     snap.current = {
       ...snap.current,
