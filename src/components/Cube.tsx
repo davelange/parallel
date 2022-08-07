@@ -1,10 +1,17 @@
-import { Vector3, Matrix4, Vector } from "three";
+import { Vector3, Matrix4, Vector, BackSide } from "three";
 import { Mesh } from "three";
 import { useEffect, useRef } from "react";
 import { CollideBeginEvent, Triplet, useBox } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
-import { easeInOutBack, easeOutBounce } from "../utils/easings";
-import useSceneStore from "../lib/sceneStore";
+import {
+  easeInOutBack,
+  easeInOutCirc,
+  easeOutBounce,
+  easeOutCubic,
+  easeOutQuart,
+} from "../utils/easings";
+import useSceneStore, { BlockType } from "../lib/sceneStore";
+import { Edges } from "@react-three/drei";
 
 const CYCLES = 100;
 
@@ -16,30 +23,20 @@ enum _ {
   POS = 1,
 }
 
-export default function Cube({
-  x,
-  y,
-  z,
-  endX,
-  motionX,
-  motionY,
-}: {
-  x: number;
-  y: number;
-  z: number;
-  endX: number;
-  motionX: number;
-  motionY: number;
-}) {
+const ANGULAR_VEL = [0.2, 0.2, 0.2];
+
+export default function Cube({ x, y, z, endX, motionX, motionY, pallete }: BlockType) {
   const [cubeRef, api] = useBox<Mesh>(() => ({
     mass: 1,
     position: [x, y, z],
-    velocity: [motionX, motionY, 0],
+    rotation: [x, y, z],
+    velocity: [motionX, motionY, motionY],
+    angularVelocity: [0.2, 0.2, 0.2],
     onCollideBegin: invertGravity,
   }));
 
-  const velo = useRef<Triplet>([motionX, motionY, 0]);
   const floating = useRef(true);
+  const velo = useRef<Triplet>([motionX, motionY, 0]);
   const pos = useRef<Triplet>();
   const rotation = useRef<Triplet>();
   const snap = useRef({
@@ -48,6 +45,8 @@ export default function Cube({
     lastMove: 0,
     alternator: [1, 1, 1] as Triplet,
   });
+
+  useSceneStore.subscribe(() => startSnap());
 
   useEffect(() => {
     api.position.subscribe((v) => (pos.current = v));
@@ -65,6 +64,8 @@ export default function Cube({
       velo.current[_.Y] *= -1;
     } else if (["right", "left"].includes(limit)) {
       velo.current[_.X] *= -1;
+    } else if (["startt", "end"].includes(limit)) {
+      velo.current[_.Z] *= -1;
     }
 
     api.velocity.set(...velo.current);
@@ -89,6 +90,9 @@ export default function Cube({
     } else {
       floating.current = true;
       api.velocity.set(...velo.current);
+      api.isTrigger.set(true);
+      api.collisionResponse.set(true);
+      api.angularVelocity.set(...(ANGULAR_VEL as Triplet));
       snap.current = {
         ...snap.current,
         lastMove: 0,
@@ -96,8 +100,6 @@ export default function Cube({
       };
     }
   }
-
-  useSceneStore.subscribe(() => startSnap());
 
   function rotate() {
     if (!rotation?.current) {
@@ -125,7 +127,7 @@ export default function Cube({
     const [x, y, z] = pos.current;
     let { doneCycles, alternator, initialPos, lastMove } = snap.current;
 
-    const ease = easeOutBounce(doneCycles, CYCLES);
+    const ease = easeOutQuart(doneCycles, CYCLES);
 
     const moveY =
       Math.abs(initialPos[_.Y]) * (ease - lastMove) * alternator[_.Y];
@@ -144,9 +146,21 @@ export default function Cube({
   });
 
   return (
-    <mesh ref={cubeRef} position={[x, y, z]} onClick={startSnap}>
-      <boxGeometry args={[0.8, 0.8, 0.8]} />
-      <meshStandardMaterial color="hotpink" />
+    <mesh ref={cubeRef} position={[x, y, z]} onClick={startSnap} name="cube">
+      {/* <line>
+        <boxGeometry args={[1, 1, 1]} />
+        <lineBasicMaterial color={color} linewidth={100} />
+      </line> */}
+      <boxGeometry args={[1, 1, 1]} />
+      <meshLambertMaterial
+        transparent
+        opacity={0.3}
+        emissive={pallete.emissive}
+        emissiveIntensity={1}
+      />
+      {/* <pointsMaterial color={color} /> */}
+      <Edges color={pallete.edges} />
+      {/* <meshBasicMaterial color={color} wireframe={true} wireframeLinewidth={10} /> */}
     </mesh>
   );
 }
