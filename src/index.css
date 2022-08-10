@@ -20,7 +20,7 @@
 }
 
 :root {
-  font-family: 'Studio Feixen Sans', Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Studio Feixen Sans", Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
@@ -52,14 +52,18 @@ a:hover {
 
 html,
 body,
-#root,
-#canvas-container {
+#root {
   height: 100%;
   width: 100%;
 }
 
+main {
+  position: relative;
+}
+
 body {
   margin: 0;
+  overflow: hidden;
 
   background: linear-gradient(90deg, #dedb7b, #c7c34a);
 }

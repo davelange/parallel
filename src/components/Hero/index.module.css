@@ -1,0 +1,12 @@
+.root {
+  padding: 2%;
+}
+
+.title {
+  font-size: 7.7em;
+  letter-spacing: -0.03em;
+}
+
+.title__secondary {
+  text-align: right;
+}
