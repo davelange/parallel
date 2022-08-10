@@ -1,5 +1,26 @@
+@font-face {
+  font-family: "Studio Feixen Sans";
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/StudioFeixenSans-Regular.otf");
+}
+
+@font-face {
+  font-family: "Recife Text Web";
+  font-style: normal;
+  font-weight: 300;
+  src: url("fonts/RecifeTextWeb-Regular.ttf");
+}
+
+@font-face {
+  font-family: "PT Mono";
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/PTMono-Regular.ttf");
+}
+
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Studio Feixen Sans', Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;

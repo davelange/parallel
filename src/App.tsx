@@ -16,6 +16,11 @@ export default function App() {
 
   return (
     <div id="canvas-container" onClick={toggleFloating}>
+      <h1>
+        Financial tech
+        <br />
+        for humans?
+      </h1>
       <Canvas camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 25] }}>
         <Physics gravity={[0, 0, 0]}>
           {/* <Debug color="#000000" scale={1.1}> */}
