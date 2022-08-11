@@ -6,3 +6,13 @@
   height: 100%;
   width: 100vw;
 }
+
+.canvas_container::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: radial-gradient(transparent, #00000022);
+  position: absolute;
+  top: 0;
+}

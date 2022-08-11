@@ -55,11 +55,13 @@ export default function Cube({
   });
 
   useSceneStore.subscribe((store) => {
-    if(pos.current) startSnap();
+    if (pos.current) startSnap();
   });
 
   useEffect(() => {
-    api.position.subscribe((v) => {pos.current = v; });
+    api.position.subscribe((v) => {
+      pos.current = v;
+    });
     api.rotation.subscribe((v) => (rotation.current = v));
   }, []);
 
@@ -81,7 +83,7 @@ export default function Cube({
     api.velocity.set(...velo.current);
   }
 
-  function startSnap() {    
+  function startSnap() {
     if (floating.current) {
       snap.current = {
         ...snap.current,
@@ -117,7 +119,7 @@ export default function Cube({
     }
 
     api.rotation.set(
-      rotation.current[_.X] + 0.01,
+      rotation.current[_.X] + 0.00,
       rotation.current[_.Y] + 0.01,
       rotation.current[_.Z] + 0.01
     );
@@ -137,7 +139,7 @@ export default function Cube({
     const [x, y, z] = pos.current;
     let { doneCycles, alternator, initialPos, lastMove } = snap.current;
 
-    const ease = easeOutQuart(doneCycles, CYCLES);
+    const ease = easeOutCubic(doneCycles, CYCLES);
 
     const moveY =
       Math.abs(initialPos[_.Y]) * (ease - lastMove) * alternator[_.Y];
@@ -157,21 +159,9 @@ export default function Cube({
 
   return (
     <mesh ref={cubeRef} position={[x, y, z]} onClick={startSnap} name="cube">
-      {/* <line>
-        <boxGeometry args={[1, 1, 1]} />
-        <lineBasicMaterial color={color} linewidth={100} />
-      </line> */}
       <boxGeometry args={[1, 1, 1]} />
-      <meshLambertMaterial
-        transparent
-        opacity={0.4}
-        color={pallete.emissive}
-        /* emissive={pallete.emissive}
-        emissiveIntensity={1}  */
-      />
-      {/* <pointsMaterial color={color} /> */}
-      <Edges color={pallete.edges} />
-      {/* <meshBasicMaterial color={color} wireframe={true} wireframeLinewidth={10} /> */}
+      <meshLambertMaterial transparent opacity={0.8} color={pallete.emissive} />
+      <Edges color={pallete.emissive} />
     </mesh>
   );
 }

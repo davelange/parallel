@@ -16,6 +16,13 @@ export enum COLOR {
 
 export const PALLETES = [
   {
+    background: COLOR.pistachio,
+    text: COLOR.gray,
+    edges: COLOR.green,
+    emissive: COLOR.orange,
+    light: COLOR.white,
+  },
+  {
     background: COLOR.green,
     text: COLOR.white,
     edges: COLOR.green,

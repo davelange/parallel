@@ -7,6 +7,7 @@ import { COLOR, EDGE_X, EDGE_Y, EDGE_Z } from "@/lib/constants";
 import { OrbitControls, Sky, Text } from "@react-three/drei";
 import style from "./index.module.css";
 import CanvasText from "../CanvasText";
+import Logo from "../Logo";
 
 export default function Canvas() {
   const { toggleFloating, genCubes, pallete } = useSceneStore((state) => ({
@@ -20,32 +21,17 @@ export default function Canvas() {
       className={style.canvas_container}
       onClick={toggleFloating}
       style={{ background: pallete.background }}
-    >      
+    >
+      <Logo
+        fill={pallete.text}
+        style={{ position: "absolute", left: "6em", top: "4em" }}
+      />
+
       <FiberCanvas
         camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 25] }}
+        style={{ zIndex: 1 }}
       >
-        {/* <Text
-          font={`/fonts/StudioFeixenSans-Regular.otf`}
-          fontSize={3.5}
-          position={[-20, 4, 0]}
-          textAlign="left"
-          anchorX="left"
-          maxWidth={25}
-        >
-          Financial tech for humans?
-        </Text>
-
-        <Text
-          font={`/fonts/StudioFeixenSans-Regular.otf`}
-          fontSize={3.5}
-          position={[9, -4, 0]}
-          textAlign="right"
-          maxWidth={25}
-        >
-          We make it happen
-        </Text> */}
         <CanvasText />
-
         <Physics gravity={[0, 0, 0]}>
           {/* <Debug color="#000000" scale={1.1}> */}
           {/* <OrbitControls /> */}
