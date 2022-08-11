@@ -59,13 +59,12 @@ body,
 
 main {
   position: relative;
+  z-index: 2;
 }
 
 body {
   margin: 0;
-  overflow: hidden;
-
-  background: linear-gradient(90deg, #dedb7b, #c7c34a);
+  overflow: hidden;  
 }
 
 h1 {

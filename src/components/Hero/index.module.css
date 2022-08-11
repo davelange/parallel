@@ -5,6 +5,7 @@
 .title {
   font-size: 7.7em;
   letter-spacing: -0.03em;
+  color: var(--text-color);
 }
 
 .title__secondary {

@@ -25,7 +25,15 @@ enum _ {
 
 const ANGULAR_VEL = [0.2, 0.2, 0.2];
 
-export default function Cube({ x, y, z, endX, motionX, motionY, pallete }: BlockType) {
+export default function Cube({
+  x,
+  y,
+  z,
+  endX,
+  motionX,
+  motionY,
+  pallete,
+}: BlockType) {
   const [cubeRef, api] = useBox<Mesh>(() => ({
     mass: 1,
     position: [x, y, z],
@@ -46,10 +54,12 @@ export default function Cube({ x, y, z, endX, motionX, motionY, pallete }: Block
     alternator: [1, 1, 1] as Triplet,
   });
 
-  useSceneStore.subscribe(() => startSnap());
+  useSceneStore.subscribe((store) => {
+    if(pos.current) startSnap();
+  });
 
   useEffect(() => {
-    api.position.subscribe((v) => (pos.current = v));
+    api.position.subscribe((v) => {pos.current = v; });
     api.rotation.subscribe((v) => (rotation.current = v));
   }, []);
 
@@ -71,7 +81,7 @@ export default function Cube({ x, y, z, endX, motionX, motionY, pallete }: Block
     api.velocity.set(...velo.current);
   }
 
-  function startSnap() {
+  function startSnap() {    
     if (floating.current) {
       snap.current = {
         ...snap.current,
@@ -109,7 +119,7 @@ export default function Cube({ x, y, z, endX, motionX, motionY, pallete }: Block
     api.rotation.set(
       rotation.current[_.X] + 0.01,
       rotation.current[_.Y] + 0.01,
-      rotation.current[_.Z]
+      rotation.current[_.Z] + 0.01
     );
   }
 
@@ -154,9 +164,10 @@ export default function Cube({ x, y, z, endX, motionX, motionY, pallete }: Block
       <boxGeometry args={[1, 1, 1]} />
       <meshLambertMaterial
         transparent
-        opacity={0.3}
-        emissive={pallete.emissive}
-        emissiveIntensity={1}
+        opacity={0.4}
+        color={pallete.emissive}
+        /* emissive={pallete.emissive}
+        emissiveIntensity={1}  */
       />
       {/* <pointsMaterial color={color} /> */}
       <Edges color={pallete.edges} />

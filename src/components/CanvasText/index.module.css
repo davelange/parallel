@@ -1,0 +1,28 @@
+.wrapper {
+  width: 100vw;
+  height: 100vh;
+  padding-top: 4em;
+}
+
+.logo {
+  fill: var(--text-color);
+}
+
+.title {
+  margin: 0.55em 0;
+  font-size: 7.788em;
+  letter-spacing: -0.03em;
+  color: var(--text-color);
+}
+
+.title__secondary {
+  text-align: right;
+}
+
+.tagline {
+  max-width: 700px;
+  margin-top: -3em;
+  font-size: 1.388em;
+  line-height: 150%;
+  color: var(--text-color);
+}
