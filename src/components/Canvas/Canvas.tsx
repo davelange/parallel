@@ -8,6 +8,7 @@ import { OrbitControls, Sky, Text } from "@react-three/drei";
 import style from "./index.module.css";
 import CanvasText from "../CanvasText";
 import Logo from "../Logo";
+import Sphere from "../Sphere";
 
 export default function Canvas() {
   const { toggleFloating, genCubes, pallete } = useSceneStore((state) => ({
@@ -33,50 +34,52 @@ export default function Canvas() {
       >
         <CanvasText />
         <Physics gravity={[0, 0, 0]}>
-          {/* <Debug color="#000000" scale={1.1}> */}
-          {/* <OrbitControls /> */}
+          <Debug color="#000000" scale={1.1}>
+            <OrbitControls />
 
-          <Limit
-            name="start"
-            position={[0, 0, EDGE_Z]}
-            rotation={[0, Math.PI, 0]}
-          />
-          <Limit name="end" position={[0, 0, -EDGE_Z]} rotation={[0, 0, 0]} />
-          <Limit
-            name="right"
-            position={[EDGE_X, 0, 0]}
-            rotation={[0, -Math.PI / 2, 0]}
-          />
-          <Limit
-            name="top"
-            position={[0, EDGE_Y, 0]}
-            rotation={[Math.PI / 2, 0, 0]}
-          />
-          <Limit
-            name="bottom"
-            position={[0, -EDGE_Y, 0]}
-            rotation={[-Math.PI / 2, 0, 0]}
-          />
-          <Limit
-            name="left"
-            position={[-EDGE_X, 0, 0]}
-            rotation={[0, Math.PI / 2, 0]}
-          />
+            <Limit
+              name="start"
+              position={[0, 0, EDGE_Z]}
+              rotation={[0, Math.PI, 0]}
+            />
+            <Limit name="end" position={[0, 0, -EDGE_Z]} rotation={[0, 0, 0]} />
+            <Limit
+              name="right"
+              position={[EDGE_X, 0, 0]}
+              rotation={[0, -Math.PI / 2, 0]}
+            />
+            <Limit
+              name="top"
+              position={[0, EDGE_Y, 0]}
+              rotation={[Math.PI / 2, 0, 0]}
+            />
+            <Limit
+              name="bottom"
+              position={[0, -EDGE_Y, 0]}
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
+            <Limit
+              name="left"
+              position={[-EDGE_X, 0, 0]}
+              rotation={[0, Math.PI / 2, 0]}
+            />
 
-          {genCubes().map((item, ind) => (
-            <Cube {...item} key={ind} />
-          ))}
+            {genCubes().map((item, ind) => (
+              <Cube {...item} key={ind} />
+            ))}
 
-          {/* <Background /> */}
+            <Sphere />
 
-          {/* <ambientLight intensity={0.1} /> */}
-          <directionalLight color={pallete.light} position={[0, 0, 15]} />
-          <pointLight
-            color={pallete.light}
-            intensity={10}
-            position={[-5, 10, 0]}
-          />
-          {/* </Debug> */}
+            {/* <Background /> */}
+
+            {/* <ambientLight intensity={0.1} /> */}
+            <directionalLight color={pallete.light} position={[0, 0, 15]} />
+            <pointLight
+              color={pallete.light}
+              intensity={10}
+              position={[-5, 10, 0]}
+            />
+          </Debug>
         </Physics>
       </FiberCanvas>
     </div>

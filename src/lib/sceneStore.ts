@@ -21,8 +21,11 @@ export type BlockType = {
 
 const useSceneStore = create<SceneStore>((set, get) => ({
   floating: true,
-  pallete: PALLETES[1],
-  toggleFloating: () => set((store) => ({ floating: !store.floating })),
+  pallete: PALLETES[0],
+  toggleFloating: () => {
+    console.log("set floating to", !get().floating);
+    set((store) => ({ floating: !store.floating }));
+  },
   genCubes: () => {
     const pallete = get().pallete;
 

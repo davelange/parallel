@@ -43,7 +43,8 @@ export default function Cube({
     onCollideBegin: invertGravity,
   }));
 
-  const floating = useRef(true);
+  /* const floating = useRef(true); */
+  const floating = useSceneStore().floating;
   const velo = useRef<Triplet>([motionX, motionY, 0]);
   const pos = useRef<Triplet>();
   const rotation = useRef<Triplet>();
@@ -66,7 +67,9 @@ export default function Cube({
   }, []);
 
   function invertGravity(event: CollideBeginEvent) {
-    if (!floating.current) {
+    console.log("collision", floating);
+
+    if (!floating) {
       return;
     }
 
@@ -74,6 +77,8 @@ export default function Cube({
 
     if (["top", "bottom"].includes(limit)) {
       velo.current[_.Y] *= -1;
+
+      api.velocity.set(...velo.current);
     } else if (["right", "left"].includes(limit)) {
       velo.current[_.X] *= -1;
     } else if (["startt", "end"].includes(limit)) {
@@ -84,7 +89,7 @@ export default function Cube({
   }
 
   function startSnap() {
-    if (floating.current) {
+    if (floating) {
       snap.current = {
         ...snap.current,
         initialPos: pos.current!,
@@ -94,13 +99,15 @@ export default function Cube({
           pos.current![_.Z] > 0 ? _.NEG : _.POS,
         ],
       };
-      floating.current = false;
+      /* floating = false; */
       api.velocity.set(0, 0, 0);
       api.isTrigger.set(false);
       api.collisionResponse.set(false);
       api.angularVelocity.set(0, 0, 0);
     } else {
-      floating.current = true;
+      console.log("wakeup");
+
+      /* floating.current = true; */
       api.velocity.set(...velo.current);
       api.isTrigger.set(true);
       api.collisionResponse.set(true);
@@ -119,20 +126,32 @@ export default function Cube({
     }
 
     api.rotation.set(
-      rotation.current[_.X] + 0.00,
+      rotation.current[_.X] + 0.0,
       rotation.current[_.Y] + 0.01,
       rotation.current[_.Z] + 0.01
     );
   }
 
+  /* function endSnap() {
+    console.log("end");
+    api.isTrigger.set(true);
+    api.collisionResponse.set(true);
+    api.velocity.set(...velo.current);
+    api.mass.set(1);
+  } */
+
   useFrame(() => {
     rotate();
 
-    if (
-      !pos.current ||
-      floating.current ||
-      snap.current.doneCycles === CYCLES
-    ) {
+    /* if (!floating.current && snap.current.doneCycles === CYCLES) {
+      endSnap();
+
+      snap.current.doneCycles++;
+
+      return;
+    } */
+
+    if (!pos.current || floating || snap.current.doneCycles === CYCLES) {
       return;
     }
 
