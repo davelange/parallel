@@ -42,7 +42,7 @@ export default function Canvas() {
               position={[0, 0, EDGE_Z]}
               rotation={[0, Math.PI, 0]}
             />
-            <Limit name="end" position={[0, 0, -EDGE_Z]} rotation={[0, 0, 0]} />
+            <Limit name="end" position={[0, 0, -(EDGE_Z + 10)]} rotation={[0, 0, 0]} />
             <Limit
               name="right"
               position={[EDGE_X, 0, 0]}
@@ -64,11 +64,11 @@ export default function Canvas() {
               rotation={[0, Math.PI / 2, 0]}
             />
 
-            {genCubes().map((item, ind) => (
-              <Cube {...item} key={ind} />
-            ))}
-
             <Sphere />
+
+            {genCubes().map((item, ind) => (
+              <Cube {...item} ind={ind} key={ind} />
+            ))}
 
             {/* <Background /> */}
 

@@ -17,6 +17,7 @@ export type BlockType = {
   motionX: number;
   motionY: number;
   pallete: typeof PALLETES[number];
+  ind: number;
 };
 
 const useSceneStore = create<SceneStore>((set, get) => ({

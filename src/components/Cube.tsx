@@ -12,10 +12,11 @@ import {
 } from "../utils/easings";
 import useSceneStore, { BlockType } from "../lib/sceneStore";
 import { Edges } from "@react-three/drei";
+import { BLOCK_QTY } from "@/lib/constants";
 
 const CYCLES = 100;
 
-enum _ {
+export enum _ {
   X = 0,
   Y = 1,
   Z = 2,
@@ -33,6 +34,7 @@ export default function Cube({
   motionX,
   motionY,
   pallete,
+  ind,
 }: BlockType) {
   const [cubeRef, api] = useBox<Mesh>(() => ({
     mass: 1,
@@ -43,8 +45,8 @@ export default function Cube({
     onCollideBegin: invertGravity,
   }));
 
-  /* const floating = useRef(true); */
-  const floating = useSceneStore().floating;
+  const floatingState = useSceneStore().floating;
+
   const velo = useRef<Triplet>([motionX, motionY, 0]);
   const pos = useRef<Triplet>();
   const rotation = useRef<Triplet>();
@@ -67,9 +69,9 @@ export default function Cube({
   }, []);
 
   function invertGravity(event: CollideBeginEvent) {
-    console.log("collision", floating);
+    console.log(`invertGravity: ${floatingState} | -> ${event.body.name}`);
 
-    if (!floating) {
+    if (!floatingState) {
       return;
     }
 
@@ -89,7 +91,7 @@ export default function Cube({
   }
 
   function startSnap() {
-    if (floating) {
+    if (floatingState) {
       snap.current = {
         ...snap.current,
         initialPos: pos.current!,
@@ -100,23 +102,30 @@ export default function Cube({
         ],
       };
       /* floating = false; */
-      api.velocity.set(0, 0, 0);
+      /* api.velocity.set(0, 0, 0);
       api.isTrigger.set(false);
       api.collisionResponse.set(false);
-      api.angularVelocity.set(0, 0, 0);
+      api.angularVelocity.set(0, 0, 0); */
+      api.sleep();
     } else {
-      console.log("wakeup");
-
       /* floating.current = true; */
-      api.velocity.set(...velo.current);
+      /* api.velocity.set(...velo.current);
       api.isTrigger.set(true);
       api.collisionResponse.set(true);
-      api.angularVelocity.set(...(ANGULAR_VEL as Triplet));
+      api.angularVelocity.set(...(ANGULAR_VEL as Triplet)); */
+      api.wakeUp();
+      api.velocity.set(...velo.current);
       snap.current = {
         ...snap.current,
         lastMove: 0,
         doneCycles: 0,
       };
+
+      if (ind === 0) {
+        api.applyForce([100, 0, 0], [0, 0, 0]);
+      } else if (ind === BLOCK_QTY - 1) {
+        api.applyForce([-100, 0, 0], [0, 0, 0]);
+      }
     }
   }
 
@@ -132,26 +141,10 @@ export default function Cube({
     );
   }
 
-  /* function endSnap() {
-    console.log("end");
-    api.isTrigger.set(true);
-    api.collisionResponse.set(true);
-    api.velocity.set(...velo.current);
-    api.mass.set(1);
-  } */
-
   useFrame(() => {
     rotate();
 
-    /* if (!floating.current && snap.current.doneCycles === CYCLES) {
-      endSnap();
-
-      snap.current.doneCycles++;
-
-      return;
-    } */
-
-    if (!pos.current || floating || snap.current.doneCycles === CYCLES) {
+    if (!pos.current || floatingState || snap.current.doneCycles === CYCLES) {
       return;
     }
 
@@ -177,7 +170,7 @@ export default function Cube({
   });
 
   return (
-    <mesh ref={cubeRef} position={[x, y, z]} onClick={startSnap} name="cube">
+    <mesh ref={cubeRef} position={[x, y, z]} name={`cube-${ind}`}>
       <boxGeometry args={[1, 1, 1]} />
       <meshLambertMaterial transparent opacity={0.8} color={pallete.emissive} />
       <Edges color={pallete.emissive} />
