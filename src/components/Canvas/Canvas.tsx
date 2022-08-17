@@ -4,11 +4,10 @@ import Cube from "@/components/Cube";
 import Limit from "@/components/Limit";
 import useSceneStore from "@/lib/sceneStore";
 import { COLOR, EDGE_X, EDGE_Y, EDGE_Z } from "@/lib/constants";
-import { OrbitControls, Sky, Text } from "@react-three/drei";
+import { Edges, OrbitControls, Sky, Text } from "@react-three/drei";
 import style from "./index.module.css";
 import CanvasText from "../CanvasText";
 import Logo from "../Logo";
-import Sphere from "../Sphere";
 
 export default function Canvas() {
   const { toggleFloating, genCubes, pallete } = useSceneStore((state) => ({
@@ -25,7 +24,7 @@ export default function Canvas() {
     >
       <Logo
         fill={pallete.text}
-        style={{ position: "absolute", left: "6em", top: "4em" }}
+        style={{ position: "absolute", left: "2em", top: "4em" }}
       />
 
       <FiberCanvas
@@ -42,7 +41,11 @@ export default function Canvas() {
               position={[0, 0, EDGE_Z]}
               rotation={[0, Math.PI, 0]}
             />
-            <Limit name="end" position={[0, 0, -(EDGE_Z + 10)]} rotation={[0, 0, 0]} />
+            <Limit
+              name="end"
+              position={[0, 0, -(EDGE_Z + 10)]}
+              rotation={[0, 0, 0]}
+            />
             <Limit
               name="right"
               position={[EDGE_X, 0, 0]}
@@ -64,15 +67,10 @@ export default function Canvas() {
               rotation={[0, Math.PI / 2, 0]}
             />
 
-            <Sphere />
-
             {genCubes().map((item, ind) => (
               <Cube {...item} ind={ind} key={ind} />
             ))}
 
-            {/* <Background /> */}
-
-            {/* <ambientLight intensity={0.1} /> */}
             <directionalLight color={pallete.light} position={[0, 0, 15]} />
             <pointLight
               color={pallete.light}

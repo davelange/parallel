@@ -1,18 +1,15 @@
 import useSceneStore from "@/lib/sceneStore";
-import { Text, Html } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
-import classNames from "classnames";
-import React from "react";
-import style from "./index.module.css";
 
 export default function CanvasText() {
   const { viewport } = useThree();
 
   const pallete = useSceneStore((store) => store.pallete);
 
-  const text1PosX = (viewport.width / 2) * -1 + 1;
-  const text2PosX = viewport.width / 2 - 1;
-  const text3PosY = (viewport.height / 2) * -1 + 3;
+  const text1PosX = (viewport.width / 2) * -1 - 1;
+  const text2PosX = viewport.width / 2 + 1;
+  const text3PosY = (viewport.height / 2) * -1 + 3.5;
 
   const commonProps = {
     color: pallete.text,
@@ -24,12 +21,12 @@ export default function CanvasText() {
     <>
       <Text
         {...commonProps}
-        fontSize={3.5}
+        fontSize={3.5}      
         lineHeight={1}
-        maxWidth={25}
+        maxWidth={25}        
         textAlign="left"
         anchorX="left"
-        position={[text1PosX, 3, -2]}
+        position={[text1PosX, 5, -2]}
       >
         Financial tech for humans?
       </Text>
@@ -40,7 +37,7 @@ export default function CanvasText() {
         maxWidth={25}
         textAlign="right"
         anchorX="right"
-        position={[text2PosX, -3, -2]}
+        position={[text2PosX, -5, -2]}
       >
         We make it happen.
       </Text>

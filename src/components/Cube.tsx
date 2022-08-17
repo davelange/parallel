@@ -1,20 +1,11 @@
-import { Vector3, Matrix4, Vector, BackSide } from "three";
 import { Mesh } from "three";
 import { useEffect, useRef } from "react";
 import { CollideBeginEvent, Triplet, useBox } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
-import {
-  easeInOutBack,
-  easeInOutCirc,
-  easeOutBounce,
-  easeOutCubic,
-  easeOutQuart,
-} from "../utils/easings";
+import { easeOutCubic } from "../utils/easings";
 import useSceneStore, { BlockType } from "../lib/sceneStore";
 import { Edges } from "@react-three/drei";
-import { BLOCK_QTY } from "@/lib/constants";
-
-const CYCLES = 100;
+import { SNAP_DURATION } from "@/lib/constants";
 
 export enum _ {
   X = 0,
@@ -25,6 +16,8 @@ export enum _ {
 }
 
 const ANGULAR_VEL = [0.2, 0.2, 0.2];
+
+let frame = 0;
 
 export default function Cube({
   x,
@@ -45,88 +38,93 @@ export default function Cube({
     onCollideBegin: invertGravity,
   }));
 
-  const floatingState = useSceneStore().floating;
+  const floating = useSceneStore((s) => s.floating);
 
   const velo = useRef<Triplet>([motionX, motionY, 0]);
   const pos = useRef<Triplet>();
   const rotation = useRef<Triplet>();
+  const snapLastPos = useRef<Triplet>([0, 0, 0]);
   const snap = useRef({
+    active: false,
     initialPos: [0, 0, 0] as Triplet,
+    initialRot: [0, 0, 0] as Triplet,
     doneCycles: 0,
     lastMove: 0,
+    destination: [endX, 0, 0] as Triplet,
     alternator: [1, 1, 1] as Triplet,
-  });
-
-  useSceneStore.subscribe((store) => {
-    if (pos.current) startSnap();
+    alternatorRot: [1, 1, 1] as Triplet,
+    endFrame: 0,
   });
 
   useEffect(() => {
-    api.position.subscribe((v) => {
-      pos.current = v;
-    });
+    api.position.subscribe((v) => (pos.current = v));
     api.rotation.subscribe((v) => (rotation.current = v));
   }, []);
 
-  function invertGravity(event: CollideBeginEvent) {
-    console.log(`invertGravity: ${floatingState} | -> ${event.body.name}`);
+  useEffect(() => {
+    if (!pos?.current) return;
 
-    if (!floatingState) {
+    floating ? snapBack() : snapToCenter();
+  }, [floating]);
+
+  function invertGravity(event: CollideBeginEvent) {
+    if (!floating) {
       return;
     }
 
     const limit = event.body.name;
 
     if (["top", "bottom"].includes(limit)) {
-      velo.current[_.Y] *= -1;
-
+      velo.current[_.Y] *= _.NEG;
       api.velocity.set(...velo.current);
     } else if (["right", "left"].includes(limit)) {
-      velo.current[_.X] *= -1;
+      velo.current[_.X] *= _.NEG;
     } else if (["startt", "end"].includes(limit)) {
-      velo.current[_.Z] *= -1;
+      velo.current[_.Z] *= _.NEG;
     }
 
     api.velocity.set(...velo.current);
   }
 
-  function startSnap() {
-    if (floatingState) {
-      snap.current = {
-        ...snap.current,
-        initialPos: pos.current!,
-        alternator: [
-          pos.current![_.X] > endX ? _.NEG : _.POS,
-          pos.current![_.Y] > 0 ? _.NEG : _.POS,
-          pos.current![_.Z] > 0 ? _.NEG : _.POS,
-        ],
-      };
-      /* floating = false; */
-      /* api.velocity.set(0, 0, 0);
-      api.isTrigger.set(false);
-      api.collisionResponse.set(false);
-      api.angularVelocity.set(0, 0, 0); */
-      api.sleep();
-    } else {
-      /* floating.current = true; */
-      /* api.velocity.set(...velo.current);
-      api.isTrigger.set(true);
-      api.collisionResponse.set(true);
-      api.angularVelocity.set(...(ANGULAR_VEL as Triplet)); */
-      api.wakeUp();
-      api.velocity.set(...velo.current);
-      snap.current = {
-        ...snap.current,
-        lastMove: 0,
-        doneCycles: 0,
-      };
+  function calcAlternator(prop: string, to: Triplet): Triplet {
+    const data = prop === "position" ? pos.current : rotation.current;
 
-      if (ind === 0) {
-        api.applyForce([100, 0, 0], [0, 0, 0]);
-      } else if (ind === BLOCK_QTY - 1) {
-        api.applyForce([-100, 0, 0], [0, 0, 0]);
-      }
-    }
+    return [
+      data![_.X] > to[_.X] ? _.NEG : _.POS,
+      data![_.Y] > to[_.Y] ? _.NEG : _.POS,
+      data![_.Z] > to[_.Z] ? _.NEG : _.POS,
+    ];
+  }
+
+  function snapToCenter() {
+    api.sleep();
+    
+    snap.current = {
+      active: true,
+      initialPos: pos.current!,
+      initialRot: rotation.current!,
+      destination: [endX, 0, 0],
+      lastMove: 0,
+      doneCycles: 0,
+      alternator: calcAlternator("position", [endX, 0, 0]),
+      alternatorRot: calcAlternator("rotation", [0, 0, 0]),
+      endFrame: 0,
+    };
+    snapLastPos.current = pos.current!;
+  }
+
+  function snapBack() {
+    snap.current = {
+      active: true,
+      destination: snapLastPos.current,
+      initialPos: pos.current!,
+      initialRot: rotation.current!,
+      lastMove: 0,
+      doneCycles: 0,
+      alternator: calcAlternator("position", snapLastPos.current),
+      alternatorRot: calcAlternator("rotation", [0, 0, 0]),
+      endFrame: 0,
+    };
   }
 
   function rotate() {
@@ -134,33 +132,88 @@ export default function Cube({
       return;
     }
 
+    if (floating) {
+      api.rotation.set(
+        rotation.current[_.X] + 0.01,
+        rotation.current[_.Y] + 0.01,
+        rotation.current[_.Z] + 0.01
+      );
+
+      return;
+    }
+
+    const staggerOffset = ind * 150;
+
+    if (frame < snap.current.endFrame + staggerOffset || snap.current.active) {
+      return;
+    }
+
     api.rotation.set(
-      rotation.current[_.X] + 0.0,
-      rotation.current[_.Y] + 0.01,
-      rotation.current[_.Z] + 0.01
+      rotation.current[_.X] + 0.02,
+      rotation.current[_.Y],
+      rotation.current[_.Z]
     );
   }
 
   useFrame(() => {
+    frame++;
+
     rotate();
 
-    if (!pos.current || floatingState || snap.current.doneCycles === CYCLES) {
+    if (!pos.current || !rotation.current || !snap.current.active) {
       return;
     }
 
-    const [x, y, z] = pos.current;
-    let { doneCycles, alternator, initialPos, lastMove } = snap.current;
+    const [px, py, pz] = pos.current;
+    const [rx, ry, rz] = rotation.current;
+    let {
+      doneCycles,
+      alternator,
+      alternatorRot,
+      initialPos,
+      initialRot,
+      lastMove,
+      destination,
+    } = snap.current;
 
-    const ease = easeOutCubic(doneCycles, CYCLES);
+    if (doneCycles === SNAP_DURATION) {
+      if (floating) {
+        api.velocity.set(...velo.current);
+        api.wakeUp();
+      } else {
+        api.sleep();
+      }
+
+      snap.current.active = false;
+      snap.current.endFrame = frame;
+
+      return;
+    }
+
+    const ease = easeOutCubic(doneCycles, SNAP_DURATION);
 
     const moveY =
-      Math.abs(initialPos[_.Y]) * (ease - lastMove) * alternator[_.Y];
+      Math.abs(initialPos[_.Y] - destination[_.Y]) *
+      (ease - lastMove) *
+      alternator[_.Y];
     const moveX =
-      Math.abs(initialPos[_.X] - endX) * (ease - lastMove) * alternator[_.X];
+      Math.abs(initialPos[_.X] - destination[_.X]) *
+      (ease - lastMove) *
+      alternator[_.X];
     const moveZ =
-      Math.abs(initialPos[_.Z]) * (ease - lastMove) * alternator[_.Z];
+      Math.abs(initialPos[_.Z] - destination[_.Z]) *
+      (ease - lastMove) *
+      alternator[_.Z];
 
-    api.position.set(x + moveX, y + moveY, z + moveZ);
+    const rotZ =
+      Math.abs(initialRot[_.Z]) * (ease - lastMove) * alternatorRot[_.Z];
+    const rotX =
+      Math.abs(initialRot[_.X]) * (ease - lastMove) * alternatorRot[_.X];
+    const rotY =
+      Math.abs(initialRot[_.Y]) * (ease - lastMove) * alternatorRot[_.Y];
+
+    api.position.set(px + moveX, py + moveY, pz + moveZ);
+    api.rotation.set(rx + rotX, ry + rotY, rz + rotZ);
 
     snap.current = {
       ...snap.current,

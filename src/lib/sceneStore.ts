@@ -1,5 +1,10 @@
 import create from "zustand";
-import { randAlternate, randPosOrNeg } from "../utils/math";
+import {
+  randAlternate,
+  randInRange,
+  randIntInRange,
+  randPosOrNeg,
+} from "../utils/math";
 import { BLOCK_QTY, EDGE_X, PALLETES, SPEED } from "./constants";
 
 type SceneStore = {
@@ -22,11 +27,14 @@ export type BlockType = {
 
 const useSceneStore = create<SceneStore>((set, get) => ({
   floating: true,
-  pallete: PALLETES[0],
+  pallete: PALLETES[randIntInRange(0, 1)],
+
   toggleFloating: () => {
-    console.log("set floating to", !get().floating);
-    set((store) => ({ floating: !store.floating }));
+    const newVal = !get().floating;
+
+    set(() => ({ floating: newVal }));
   },
+
   genCubes: () => {
     const pallete = get().pallete;
 
@@ -34,9 +42,9 @@ const useSceneStore = create<SceneStore>((set, get) => ({
       (_, ind) =>
         ({
           x: randPosOrNeg(15),
-          y: randPosOrNeg(6),
+          y: randPosOrNeg(10),
           z: randPosOrNeg(4),
-          endX: (ind * (EDGE_X * 2)) / BLOCK_QTY - EDGE_X,
+          endX: (ind * ((EDGE_X - 2) * 2)) / BLOCK_QTY - EDGE_X,
           motionX: randAlternate(SPEED),
           motionY: randAlternate(SPEED),
           pallete,
