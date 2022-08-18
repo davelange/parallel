@@ -8,6 +8,7 @@ import { Edges, OrbitControls, Sky, Text } from "@react-three/drei";
 import style from "./index.module.css";
 import CanvasText from "../CanvasText";
 import Logo from "../Logo";
+import { GridHelper } from "three";
 
 export default function Canvas() {
   const { toggleFloating, genCubes, pallete } = useSceneStore((state) => ({
@@ -24,17 +25,17 @@ export default function Canvas() {
     >
       <Logo
         fill={pallete.text}
-        style={{ position: "absolute", left: "2em", top: "4em" }}
+        style={{ position: "absolute", left: "2em", top: "2em" }}
       />
 
       <FiberCanvas
         camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 25] }}
         style={{ zIndex: 1 }}
       >
-        <CanvasText />
         <Physics gravity={[0, 0, 0]}>
-          <Debug color="#000000" scale={1.1}>
-            <OrbitControls />
+          <CanvasText />
+          {/* <Debug color="#000000" scale={1.1}> */}
+            {/* <OrbitControls /> */}
 
             <Limit
               name="start"
@@ -77,7 +78,7 @@ export default function Canvas() {
               intensity={10}
               position={[-5, 10, 0]}
             />
-          </Debug>
+          {/* </Debug> */}
         </Physics>
       </FiberCanvas>
     </div>

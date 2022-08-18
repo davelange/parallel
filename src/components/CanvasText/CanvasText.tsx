@@ -21,25 +21,25 @@ export default function CanvasText() {
     <>
       <Text
         {...commonProps}
-        fontSize={3.5}      
+        fontSize={4}
         lineHeight={1}
-        maxWidth={25}        
+        maxWidth={25}
         textAlign="left"
         anchorX="left"
-        position={[text1PosX, 5, -2]}
+        position={[text1PosX, 4.5, -2]}
       >
         Financial tech for humans?
       </Text>
       <Text
         {...commonProps}
-        fontSize={3.5}
+        fontSize={4}
         lineHeight={1}
-        maxWidth={25}
+        maxWidth={20}
         textAlign="right"
         anchorX="right"
         position={[text2PosX, -5, -2]}
       >
-        We make it happen.
+        We make &emsp; it happen.
       </Text>
       <Text
         {...commonProps}
