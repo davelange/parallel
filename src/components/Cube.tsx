@@ -2,9 +2,9 @@ import { Mesh } from "three";
 import { useEffect, useRef } from "react";
 import { CollideBeginEvent, Triplet, useBox } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
-import { easeOutCubic } from "../utils/easings";
+import { getEasing } from "../utils/easings";
 import useSceneStore, { BlockType } from "../lib/sceneStore";
-import { Edges, MeshReflectorMaterial } from "@react-three/drei";
+import { Edges } from "@react-three/drei";
 import { SNAP_DURATION } from "@/lib/constants";
 
 export enum _ {
@@ -190,7 +190,7 @@ export default function Cube({
       return;
     }
 
-    const ease = easeOutCubic(doneCycles, SNAP_DURATION);
+    const ease = getEasing(doneCycles, SNAP_DURATION);
 
     const moveY =
       Math.abs(initialPos[_.Y] - destination[_.Y]) *

@@ -26,7 +26,7 @@ export default function CanvasText() {
         maxWidth={25}
         textAlign="left"
         anchorX="left"
-        position={[text1PosX, 4.5, -2]}
+        position={[text1PosX, 5, -2]}
       >
         Financial tech for humans?
       </Text>

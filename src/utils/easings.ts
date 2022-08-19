@@ -1,5 +1,7 @@
 // Taken from https://easings.net/
 
+import useSceneStore from "@/lib/sceneStore";
+
 function getProgress(done: number, target: number) {
   return (done * 100) / target / 100;
 }
@@ -50,4 +52,24 @@ export function easeOutQuart(done: number, target: number): number {
   let x = getProgress(done, target);
 
   return 1 - Math.pow(1 - x, 4);
+}
+
+export function getEasing(done: number, target: number) {
+  switch (useSceneStore.getState().easing) {
+    case "easeOutCubic":
+      return easeOutCubic(done, target);
+
+    case "easeOutQuart":
+      return easeOutQuart(done, target);
+
+    case "easeInOutCirc":
+      return easeInOutCirc(done, target);
+
+    case "easeInOutBack":
+      return easeInOutBack(done, target);
+
+    default:
+    case "easeOutBounce":
+      return easeOutBounce(done, target);
+  }
 }

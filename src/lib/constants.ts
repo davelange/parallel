@@ -27,8 +27,8 @@ export const PALLETES = [
     background: COLOR.pistachio,
     text: COLOR.gray,
     edges: COLOR.green,
-    emissive: COLOR.orange,
-    light: COLOR.white,
+    emissive: COLOR.white,
+    light: COLOR.pink,
   },
   {
     background: COLOR.green,

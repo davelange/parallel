@@ -1,0 +1,10 @@
+.editor {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 999;
+  background: #fff;
+}
+.block {
+  margin: 16px 0;
+}
