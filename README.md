@@ -1,6 +1,6 @@
 # Parallel
 
-A three.js demo scene, built with Vite + React + React-three-fiber. 
+A react and three.js demo scene, built with Vite + React + React-three-fiber. 
 
 It includes an editor to switch between different color scemes and easing functions.
 
