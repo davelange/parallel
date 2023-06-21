@@ -6,3 +6,12 @@
   height: 100%;
   width: 100vw;
 }
+
+.canvas_container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: radial-gradient(#ffffff00, #000000ff);
+  opacity: 0.2;
+}

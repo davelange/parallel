@@ -7,7 +7,7 @@ export const SNAP_DURATION = 70;
 
 export enum COLOR {
   white = "#f8f1ed",
-  gray = "#272727",
+  gray = "#171717",
   green = "#00524e",
   violet = "#c4b2f6",
   pistachio = "#dedb7b",
@@ -18,23 +18,26 @@ export enum COLOR {
 export const PALLETES = [
   {
     background: COLOR.gray,
-    text: COLOR.white,
+    text: COLOR.orange,
+    textSecondary: COLOR.white,
     edges: COLOR.pistachio,
     emissive: COLOR.orange,
     light: COLOR.white,
   },
   {
     background: COLOR.pistachio,
-    text: COLOR.gray,
+    text: COLOR.green,
+    textSecondary: COLOR.green,
     edges: COLOR.green,
     emissive: COLOR.white,
     light: COLOR.pink,
   },
   {
     background: COLOR.green,
-    text: COLOR.white,
+    text: COLOR.violet,
+    textSecondary: COLOR.violet,
     edges: COLOR.green,
-    emissive: COLOR.pink,
+    emissive: COLOR.pistachio,
     light: COLOR.violet,
   },
 ];

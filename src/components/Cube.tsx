@@ -24,6 +24,7 @@ export default function Cube({
   y,
   z,
   endX,
+  endY,
   motionX,
   motionY,
   pallete,
@@ -50,7 +51,7 @@ export default function Cube({
     initialRot: [0, 0, 0] as Triplet,
     doneCycles: 0,
     lastMove: 0,
-    destination: [endX, 0, 0] as Triplet,
+    destination: [endX, endY, 0] as Triplet,
     alternator: [1, 1, 1] as Triplet,
     alternatorRot: [1, 1, 1] as Triplet,
     endFrame: 0,
@@ -103,10 +104,10 @@ export default function Cube({
       active: true,
       initialPos: pos.current!,
       initialRot: rotation.current!,
-      destination: [endX, 0, 0],
+      destination: [endX, endY, 0],
       lastMove: 0,
       doneCycles: 0,
-      alternator: calcAlternator("position", [endX, 0, 0]),
+      alternator: calcAlternator("position", [endX, endY, 0]),
       alternatorRot: calcAlternator("rotation", [0, 0, 0]),
       endFrame: 0,
     };
@@ -223,10 +224,9 @@ export default function Cube({
   });
 
   return (
-    <mesh ref={cubeRef} position={[x, y, z]} name={`cube-${ind}`}>
+    <mesh ref={cubeRef} position={[x, y, z]} name={`cube-${ind}`} castShadow>
       <boxGeometry args={[1, 1, 1]} />
-      <meshLambertMaterial transparent opacity={0.8} color={pallete.emissive} />
-      <Edges color={pallete.emissive} />
+      <meshPhongMaterial color={pallete.emissive} />
     </mesh>
   );
 }

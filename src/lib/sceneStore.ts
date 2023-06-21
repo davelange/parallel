@@ -3,6 +3,7 @@ import { randAlternate, randIntInRange, randPosOrNeg } from "../utils/math";
 import { BLOCK_QTY, EDGE_X, PALLETES, SPEED } from "./constants";
 
 type SceneStore = {
+  debug: boolean;
   floating: boolean;
   pallete: typeof PALLETES[number];
   easing: string;
@@ -17,6 +18,7 @@ export type BlockType = {
   y: number;
   z: number;
   endX: number;
+  endY: number;
   motionX: number;
   motionY: number;
   pallete: typeof PALLETES[number];
@@ -24,6 +26,7 @@ export type BlockType = {
 };
 
 const useSceneStore = create<SceneStore>((set, get) => ({
+  debug: false,
   floating: true,
   pallete: PALLETES[0],
   easing: "easeOutCubic",
@@ -48,6 +51,7 @@ const useSceneStore = create<SceneStore>((set, get) => ({
           y: randPosOrNeg(10),
           z: randPosOrNeg(4),
           endX: ((ind + 1) * ((EDGE_X - 1) * 2)) / BLOCK_QTY - EDGE_X,
+          endY: -2.5,
           motionX: randAlternate(SPEED),
           motionY: randAlternate(SPEED),
           pallete,
